@@ -1187,3 +1187,11 @@ span.brownTriangle {
   width: 100%;
   object-position: top
 }
+
+/* ///////////// */
+.input-errors{
+  border: 1px solid red !important;
+}
+.form-control:focus {
+  box-shadow: unset !important;
+}

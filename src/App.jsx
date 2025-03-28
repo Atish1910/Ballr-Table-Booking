@@ -1,16 +1,19 @@
 import Navbar from "./components/Navbar";
-import Table from "./components/table";
+import Console from "./components/section/Console";
+import './index.css'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/js/bootstrap.bundle.min";
 
 function App(){
   return(
     <>
-      <Navbar></Navbar>
+      {/* <Navbar></Navbar> */}
       <section>
         <div className="container">
           <div className="row text-center">
-            <h1 className="">Ballr Table Booking Apps</h1>
+            <h1 className="">Table Booking Apps</h1>
           </div>
-          <Table></Table>
+          <Console></Console>
         </div>
       </section>
     </>
