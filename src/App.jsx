@@ -35,7 +35,7 @@ function App() {
           <Navbar />
           <div className="container text-center mt-3">
             <h2>Welcome, {loggedInUser}!</h2>
-            <button className="btn btn-danger mt-3" onClick={handleLogout}>Logout</button>
+            
           </div>
           <Routes>
             {/* Redirect to today's date on load */}
@@ -45,7 +45,11 @@ function App() {
         </Router>
       ) : (
         <Pr setIsLoggedIn={setIsLoggedIn} setLoggedInUser={setLoggedInUser} />
+        
       )}
+      <div className="text-center">
+        <button className="btn btn-danger mt-3" onClick={handleLogout}>Logout</button>
+      </div>
     </>
   );
 }

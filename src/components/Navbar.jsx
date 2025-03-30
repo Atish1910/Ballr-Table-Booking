@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 
 function Navbar() {
     const today = new Date().toISOString().slice(0, 10); // Get today's date in YYYY-MM-DD format
     const { date } = useParams(); // Get selected date from URL
+    
 
     // Generate dates dynamically
     const dates = Array.from({ length: 6 }, (_, i) => {
@@ -13,23 +15,20 @@ function Navbar() {
 
     return (
         <section className="py-3 border navbar_01">
-            <div className="container py-3">
-                <div className="row border mb-3 py-2 justify-content-around">
-                    <div className="col-3">
+            <div className="container-fluid container-lg py-3">
+                <div className="d-flex justify-content-between align-items-center border mb-3 py-2  px-5">
                         <img src="src/img/logo/1.png" alt="Logo" />
-                    </div>
-                    <div className="col-9">
-                        <h1 className="text-center">Table Booking App</h1>
-                    </div>
+                        <h1 className="text-center h3">Table Booking App</h1>
                 </div>
-                <div className="row">
+                <div className="row text-center" >
+                    
                     {dates.map((d, index) => {
                         const dateObj = new Date(d);
                         const day = dateObj.getDate(); // Get date (e.g., 30)
                         const dayLetter = dateObj.toLocaleDateString("en-GB", { weekday: "short" }).charAt(0); // Get first letter of weekday (e.g., "S" for Sunday)
 
                         return (
-                            <div key={index} className="col-2">
+                            <div key={index} className="col">
                                 <NavLink 
                                     to={`/${d}`} 
                                     className={({ isActive }) => isActive ? "active-link" : ""}

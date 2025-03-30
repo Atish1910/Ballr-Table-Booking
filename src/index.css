@@ -1188,12 +1188,6 @@ span.brownTriangle {
   object-position: top
 }
 
-/* ///////////// */
-@media (max-width:992px) {
-  .btn{
-    font-size: 10px !important;
-  }
-}
 
 .input-errors{
   border: 1px solid red !important;
@@ -1226,4 +1220,16 @@ span.brownTriangle {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+
+/* ///////////// */
+@media (max-width:992px) {
+  .btn{
+    font-size: 10px !important;
+  }
+  .navbar_01 img{
+    height: 35px;
+    /* width: 100px; */
+  }
 }
