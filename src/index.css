@@ -1189,9 +1189,41 @@ span.brownTriangle {
 }
 
 /* ///////////// */
+@media (max-width:992px) {
+  .btn{
+    font-size: 10px !important;
+  }
+}
+
 .input-errors{
   border: 1px solid red !important;
 }
 .form-control:focus {
   box-shadow: unset !important;
+}
+.navbar_01 a{
+  color: #000;
+  text-decoration: unset !important;
+  padding: 10px;
+  border: solid 1px;
+  display: inline-grid;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.navbar_01 .active-link{
+  color: var(--bs-white);
+  background-color: #be7e2c;
+  border: solid 1px #be7e2c;
+}
+.navbar_01 img{
+  height: 50px;
+  /* width: 100px; */
+}
+.login_01{
+  background-color: #be7e2c;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

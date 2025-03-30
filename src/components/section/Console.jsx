@@ -1,96 +1,140 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 function Console() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm();
+  const { date } = useParams();
+  const { register, handleSubmit, setValue, reset, formState: { errors, isSubmitting } } = useForm();
 
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [bookedTables, setBookedTables] = useState(() => {
+    return JSON.parse(localStorage.getItem(`bookings_${date}`)) || {};
+  });
+
+  useEffect(() => {
+    setBookedTables(JSON.parse(localStorage.getItem(`bookings_${date}`)) || {});
+  }, [date]);
+
+  function handleTableClick(event) {
+    const tableId = event.target.getAttribute("data-table");
+    setValue("tableId", tableId);
+  }
+
+  const loggedInUser = localStorage.getItem("loggedInUser") || "N/A";
 
   async function onSubmit(data) {
-    await new Promise((res) => setTimeout(res, 2000));
-    console.log(data);
+    await new Promise((res) => setTimeout(res, 1000));
 
-    // Store data in localStorage
-    localStorage.setItem("guestDetails", JSON.stringify(data));
+    const updatedBookings = { 
+      ...bookedTables, 
+      [data.tableId]: { 
+        booked: true, 
+        fullName: data.fullName, 
+        quantity: data.quantity,
+        bookedBy: loggedInUser  // Store the PR name who booked the table
+      } 
+    };
 
-    // Change button color and disable it
-    setIsFormSubmitted(true);
+    localStorage.setItem(`bookings_${date}`, JSON.stringify(updatedBookings));
+    setBookedTables(updatedBookings);
+
+    document.getElementById("closeModal").click();
+    reset();
   }
 
   return (
-    <>
-      <section>
-        <div className="container border border-dark py-5">
-          <div className="row text-center justify-content-center">
-            <div className="col-2 border border-dark py-3">
-              <button
-                type="button"
-                className={`btn ${isFormSubmitted ? "btn-danger" : "btn-primary"}`}
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal"
-                disabled={isFormSubmitted}
-              >
-                D1
-              </button>
+    <section>
+      <div className="container border border-dark py-5">
+        <h2 className="text-center">Table Booking for {new Date(date).toLocaleDateString("en-GB")}</h2>
+        
+        {/* Booking Buttons */}
+        <div className="row text-center justify-content-center">
+          {["D1", "D2", "D3", "D4"].map((table) => (
+            <div key={table} className="col-2 border border-dark py-3">
+              {bookedTables[table]?.booked ? (
+                <button className="btn btn-secondary" disabled>
+                  Sold : {table} <br /> {bookedTables[table].bookedBy}
+                </button>
+              ) : (
+                <button 
+                  type="button" 
+                  className="btn btn-success" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#bookingModal" 
+                  data-table={table} 
+                  onClick={handleTableClick}
+                >
+                  {table}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
 
-              <div
-                className="modal fade"
-                id="exampleModal"
-                tabIndex="-1"
-                aria-labelledby="exampleModalLabel"
-                aria-hidden="true"
-              >
-                <div className="modal-dialog">
-                  <div className="modal-content">
-                    <div className="modal-header">
-                      <h1 className="modal-title fs-5" id="exampleModalLabel">
-                        Enter Guest Details
-                      </h1>
-                      <button
-                        type="button"
-                        className="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                      ></button>
-                    </div>
-                    <div className="modal-body">
-                      <div className="row">
-                        <form
-                          onSubmit={handleSubmit(onSubmit)}
-                          className="form-control py-3 border border-dark"
-                        >
-                          <input
-                            type="text"
-                            placeholder="Enter Guest Name"
-                            className={`mb-3 form-control ${errors.fullName ? "input-errors" : ""}`}
-                            {...register("fullName", { required: true })}
-                          />
-                          <input
-                            type="number"
-                            placeholder="Enter Guest Quantity"
-                            className={`mb-3 form-control ${errors.quantity ? "input-errors" : ""}`}
-                            {...register("quantity", { required: true })}
-                          />
-                          <div>
-                            <button className="btn btn-success" disabled={isSubmitting} type="submit">
-                              {isSubmitting ? "Please Wait" : "Submit"}
-                            </button>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        {/* Booking Modal */}
+        <div className="modal fade" id="bookingModal" tabIndex="-1" aria-hidden="true">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h1 className="modal-title fs-5">Enter Guest Details</h1>
+                <button type="button" id="closeModal" className="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleSubmit(onSubmit)} className="form-control py-3 border border-dark">
+                  <input type="hidden" {...register("tableId")} />
+                  <input 
+                    type="text" 
+                    placeholder="Enter Guest Name" 
+                    className={`mb-3 form-control ${errors.fullName ? "input-errors" : ""}`} 
+                    {...register("fullName", { required: true })} 
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="Enter Guest Quantity" 
+                    className={`mb-3 form-control ${errors.quantity ? "input-errors" : ""}`} 
+                    {...register("quantity", { required: true })} 
+                  />
+                  <button className="btn btn-success" disabled={isSubmitting} type="submit">
+                    {isSubmitting ? "Please Wait" : "Submit"}
+                  </button>
+                </form>
               </div>
             </div>
           </div>
         </div>
-      </section>
-    </>
+
+        {/* Booking Details Table */}
+        <div className="mt-5">
+          <h3 className="text-center">Booking Details</h3>
+          {Object.keys(bookedTables).length > 0 ? (
+            <table className="table table-bordered text-center">
+              <thead>
+                <tr>
+                  <th>Table</th>
+                  <th>PR Name</th>
+                  <th>Guest Name</th>
+                  <th>Guest Quantity</th>
+                  <th>Bill</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(bookedTables).map(([tableId, booking]) => (
+                  <tr key={tableId}>
+                    <td>{tableId}</td>
+                    <td>{booking.bookedBy}</td>
+                    <td>{booking.fullName}</td>
+                    <td>{booking.quantity}</td>
+                    <td>50K</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="text-center">No bookings yet.</p>
+          )}
+        </div>
+
+      </div>
+    </section>
   );
 }
 
