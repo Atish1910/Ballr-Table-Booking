@@ -6,6 +6,7 @@ import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "bootstrap/dist/js/bootstrap.bundle.min";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import ExlusiveVip from "./components/section/ExlusiveVip";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,6 +38,7 @@ function App() {
             <h2>Welcome, {loggedInUser}!</h2>
             
           </div>
+          <ExlusiveVip></ExlusiveVip>
           <Routes>
             {/* Redirect to today's date on load */}
             <Route path="/" element={<Navigate to={`/${new Date().toISOString().slice(0, 10)}`} />} />
