@@ -1,61 +1,68 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+    const navigate = useNavigate();
     const { 
         register,
-        watch,
         handleSubmit,
-        reset,
-        formState : {errors , isSubmitting}
-        
+        formState: { errors, isSubmitting }
     } = useForm();
 
-    function onlogin(){
-        console.log("You just submitted form");
+    function onLogin(data) {
+        // Retrieve stored users from localStorage
+        const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+        // Check if user exists with the provided phoneNo and password
+        const userExists = storedUsers.find(user => user.phone === data.phoneNo && user.password === data.password);
+
+        if (userExists) {
+            alert("Login Successful!");
+            navigate("/dashboard"); // Redirect to a dashboard page (or another route)
+        } else {
+            alert("Invalid Phone Number or Password. Please try again.");
+        }
     }
-    
+
     return (
         <section className="login_01">
             <div className="container">
                 <div className="row justify-content-center text-center">
                     <h1>Ballr - Welcome to Ballr PR/Admin Application</h1>
                     <div className="col-lg-6 border rounded-3 py-4">
-                        <form onSubmit={handleSubmit(onlogin)}>
+                        <form onSubmit={handleSubmit(onLogin)}>
+                            {/* Phone Number Input */}
                             <input 
                                 type="number" 
                                 className={`form-control mb-3 ${errors.phoneNo ? "input-errors" : ""}`} 
                                 placeholder="Enter Phone Number"
-                                {
-                                    ...register("phoneNo",
-                                        {
-                                            required : true,
-                                            minLength : {value : 10, message : "please Enter 10 digit Mobile Number"},
-                                            maxLength : {value : 10, message : "please Enter 10 digit Mobile Number"}
-                                        }
-                                    )
-                                }
+                                {...register("phoneNo", {
+                                    required: "Phone Number is required",
+                                    minLength: { value: 11, message: "Please enter a 10-digit Mobile Number" },
+                                    maxLength: { value: 11, message: "Please enter a 10-digit Mobile Number" }
+                                })}
                             />
+                            {errors.phoneNo && <p className="text-danger">{errors.phoneNo.message}</p>}
+
+                            {/* Password Input */}
                             <input 
                                 type="password" 
-                                className={`form-control mb-3 ${errors.password ? "input-errors" : ""}` } 
+                                className={`form-control mb-3 ${errors.password ? "input-errors" : ""}`} 
                                 placeholder="Password"
-                                {
-                                    ...register("password", 
-                                        {
-                                            required : true
-                                        }
-                                    )
-                                }
+                                {...register("password", {
+                                    required: "Password is required"
+                                })}
                             />
-                            {
-                                errors.phoneNo && <p className="text-danger">{errors.message}</p>
-                            }
+                            {errors.password && <p className="text-danger">{errors.password.message}</p>}
+
+                            {/* Login Button */}
                             <div className="text-center">
-                                <button type="submit" className="btn btn-warning">Login</button>
+                                <button type="submit" className="btn btn-warning">
+                                    {isSubmitting ? "Please Wait..." : "Login"}
+                                </button>
                             </div>
                         </form>
+
                         {/* Register Button */}
                         <div className="text-center mt-3">
                             <p>Don't have an account?</p>
