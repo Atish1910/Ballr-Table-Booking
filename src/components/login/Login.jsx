@@ -1,7 +1,8 @@
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Login({ setIsLoggedIn, setLoggedInUser }) {
     const navigate = useNavigate();
     const { 
         register,
@@ -10,19 +11,32 @@ function Login() {
     } = useForm();
 
     function onLogin(data) {
-        // Retrieve stored users from localStorage
         const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-
-        // Check if user exists with the provided phoneNo and password
+    
         const userExists = storedUsers.find(user => user.phone === data.phoneNo && user.password === data.password);
-
+        const userPhone = storedUsers.find(user => user.phone === data.phoneNo);
+    
         if (userExists) {
-            alert("Login Successful!");
-            navigate("/dashboard"); // Redirect to a dashboard page (or another route)
+            if (userExists.isActivate === false) {
+                toast.error("Contact Administration to activate your account");
+                return;
+            }
+    
+            toast.success("Login Successful!");
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("loggedInUser", JSON.stringify(userExists));
+            setIsLoggedIn(true);
+            setLoggedInUser(userExists);
+            navigate("/");
         } else {
-            alert("Invalid Phone Number or Password. Please try again.");
+            if (!userPhone) {
+                toast.error("Your Phone No is not registered. Please register your phone number.");
+            } else {
+                toast.error("You entered the wrong password.");
+            }
         }
     }
+    
 
     return (
         <section className="login_01">
@@ -31,31 +45,26 @@ function Login() {
                     <h1>Ballr - Welcome to Ballr PR/Admin Application</h1>
                     <div className="col-lg-6 border rounded-3 py-4">
                         <form onSubmit={handleSubmit(onLogin)}>
-                            {/* Phone Number Input */}
                             <input 
                                 type="number" 
                                 className={`form-control mb-3 ${errors.phoneNo ? "input-errors" : ""}`} 
                                 placeholder="Enter Phone Number"
                                 {...register("phoneNo", {
                                     required: "Phone Number is required",
-                                    minLength: { value: 11, message: "Please enter a 10-digit Mobile Number" },
-                                    maxLength: { value: 11, message: "Please enter a 10-digit Mobile Number" }
+                                    minLength: { value: 10, message: "Please enter a 10-digit Mobile Number" },
+                                    maxLength: { value: 10, message: "Please enter a 10-digit Mobile Number" }
                                 })}
                             />
                             {errors.phoneNo && <p className="text-danger">{errors.phoneNo.message}</p>}
 
-                            {/* Password Input */}
                             <input 
                                 type="password" 
                                 className={`form-control mb-3 ${errors.password ? "input-errors" : ""}`} 
                                 placeholder="Password"
-                                {...register("password", {
-                                    required: "Password is required"
-                                })}
+                                {...register("password", { required: "Password is required" })}
                             />
                             {errors.password && <p className="text-danger">{errors.password.message}</p>}
 
-                            {/* Login Button */}
                             <div className="text-center">
                                 <button type="submit" className="btn btn-warning">
                                     {isSubmitting ? "Please Wait..." : "Login"}
@@ -63,12 +72,9 @@ function Login() {
                             </div>
                         </form>
 
-                        {/* Register Button */}
                         <div className="text-center mt-3">
                             <p>Don't have an account?</p>
-                            <button className="btn btn-primary" onClick={() => navigate("/register")}>
-                                Register
-                            </button>
+                            <button className="btn btn-primary" onClick={() => navigate("/register")}>Register</button>
                         </div>
                     </div>
                 </div>

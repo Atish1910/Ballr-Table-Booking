@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 function Register() {
@@ -12,14 +13,19 @@ function Register() {
 
   async function onRegistration(data) {
     await new Promise((res) => setTimeout(res, 2000)); // Simulate API delay
-    
+  
+    // Add isActivate: false if user is PR
+    const newUser = {
+      ...data,
+      isActivate: data.user === "PR" ? false : true,
+    };
+  
     const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-    storedUsers.push(data);
+    storedUsers.push(newUser);
     localStorage.setItem("users", JSON.stringify(storedUsers));
-    alert("Form Submission Successfull");
-    navigate("/")
-    reset(); // Reset the form fields
-
+  
+    toast.success("Form Submission Successful");
+    navigate("/");
   }
 
   return (

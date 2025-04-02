@@ -4,71 +4,57 @@ import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 function Console() {
-  // Get the 'date' parameter from the URL
   const { date } = useParams();
   const currentDate = new Date(date).toLocaleDateString("en-GB");
   
-  // Initialize React Hook Form
   const { register, handleSubmit, setValue, reset, formState: { errors, isSubmitting } } = useForm();
 
-  // State to store booked tables, fetched from local storage
   const [bookedTables, setBookedTables] = useState(() => {
     return JSON.parse(localStorage.getItem(`bookings_${date}`)) || {};
   });
 
-  // Effect to update state when 'date' changes
   useEffect(() => {
     setBookedTables(JSON.parse(localStorage.getItem(`bookings_${date}`)) || {});
   }, [date]);
 
-  // Function to handle table button click, setting the selected table ID in form
   function handleTableClick(event) {
     const tableId = event.target.getAttribute("data-table");
     setValue("tableId", tableId);
   }
 
-  // Retrieve the logged-in user from local storage (or default to 'N/A')
-  const loggedInUser = localStorage.getItem("loggedInUser") || "N/A";
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser")) || { name: "N/A" };
 
-  // Function to handle form submission
   async function onSubmit(data) {
-    // Simulate server delay
     await new Promise((res) => setTimeout(res, 1000));
     
-    // Update booked tables state
     const updatedBookings = { 
       ...bookedTables, 
       [data.tableId]: { 
         booked: true, 
         fullName: data.fullName, 
         quantity: data.quantity,
-        bookedBy: loggedInUser // Store the PR name who booked the table
+        bookedBy: loggedInUser.fullName // Store only PR Name
       } 
     };
     
-    // Save updated bookings in local storage
     localStorage.setItem(`bookings_${date}`, JSON.stringify(updatedBookings));
     setBookedTables(updatedBookings);
     
-    // Close modal and reset form
     document.getElementById("closeModal").click();
     reset();
   }
 
-  // Define available tables
   const consoleTables = ["D1", "D2", "D3", "D4"];
-
 
   return (
     <section>
-      <div className="container border border-dark py-5">
+      <div className="container-fluid border border-dark py-5">
         <h1 className="text-center fw-bold">01 - Section Console </h1>
         <h2 className="text-center">Table Booking for {currentDate}</h2>
         
-        {/* Display table booking buttons */}
         <div className="row text-center justify-content-center">
           {consoleTables.map((table) => (
-            <div key={table} className="col-2 border border-dark py-3">
+            <div key={table} className="col border border-dark py-3">
               {bookedTables[table]?.booked ? (
                 <button className="btn btn-secondary" disabled>
                   Sold : {table} <br /> {bookedTables[table].bookedBy}
@@ -89,7 +75,6 @@ function Console() {
           ))}
         </div>
 
-        {/* Booking modal */}
         <div className="modal fade" id="bookingModal" tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog">
             <div className="modal-content">
@@ -121,7 +106,6 @@ function Console() {
           </div>
         </div>
 
-        {/* Display booking details */}
         <div className="mt-5">
           <h3 className="text-center">Booking Details</h3>
           {Object.keys(bookedTables).length > 0 ? (
@@ -132,7 +116,6 @@ function Console() {
                   <th>PR Name</th>
                   <th>Guest Name</th>
                   <th>Guest Quantity</th>
-                  <th>Bill</th>
                 </tr>
               </thead>
               <tbody>
@@ -142,7 +125,6 @@ function Console() {
                     <td>{booking.bookedBy}</td>
                     <td>{booking.fullName}</td>
                     <td>{booking.quantity}</td>
-                    <td>50K</td>
                   </tr>
                 ))}
               </tbody>
