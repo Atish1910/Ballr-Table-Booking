@@ -17,7 +17,7 @@ function Register() {
     // Add isActivate: false if user is PR
     const newUser = {
       ...data,
-      isActivate: data.user === "PR" ? false : true,
+      isActivate: data.user === "PR" ? true : true,
     };
   
     const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
@@ -77,9 +77,7 @@ function Register() {
                   className="form-select mb-3"
                   {...register("user", { required: "Please select a user type" })}
                 >
-                  <option value="" disabled selected>
-                    Please Select Option
-                  </option>
+                  <option value="" disabled selected>Please Select Option</option>
                   <option value="PR">PR</option>
                   <option value="Admin">Admin</option>
                 </select>
@@ -87,9 +85,9 @@ function Register() {
 
                 {/* Submit Button */}
                 <div className="">
-                  <button className="btn btn-success" type="submit">
-                    {isSubmitting ? "Please Wait..." : "Submit"}
-                  </button>
+                  <button className="btn btn-success" type="submit">{isSubmitting ? "Please Wait..." : "Submit"}</button>
+                  <p className="mb-0 py-2 text-white">Already Have Account?</p>
+                  <button className="btn btn-primary" onClick={() => navigate("/")}>login</button>
                 </div>
               </form>
             </div>
