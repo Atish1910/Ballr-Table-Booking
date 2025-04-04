@@ -6,25 +6,35 @@ function Register() {
   const navigate = useNavigate();
   const {
     register,
-    watch,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm();
 
   async function onRegistration(data) {
     await new Promise((res) => setTimeout(res, 2000)); // Simulate API delay
-  
-    // Add isActivate: false if user is PR
+
+    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+    // Check if email or phone already exists
+    const isDuplicate = storedUsers.some(
+      (user) => user.email === data.email || user.phone === data.phone
+    );
+
+    if (isDuplicate) {
+      toast.error("Your email or phone is already registered");
+      return;
+    }
+
+    // Add user to local storage
     const newUser = {
       ...data,
-      isActivate: data.user === "PR" ? true : true,
+      isActivate: data.user === "PR" ? false : true, // PR users start as inactive
     };
-  
-    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
+
     storedUsers.push(newUser);
     localStorage.setItem("users", JSON.stringify(storedUsers));
-  
-    toast.success("Form Submission Successful");
+
+    toast.success("Registration Successful");
     navigate("/");
   }
 
@@ -45,15 +55,6 @@ function Register() {
                 />
                 {errors.fullName && <p className="text-danger">{errors.fullName.message}</p>}
 
-                {/* Email */}
-                <input
-                  type="email"
-                  className={`mb-3 form-control ${errors.email ? "input-errors" : ""}`}
-                  placeholder="Enter Email Id"
-                  {...register("email", { required: "Email is required" })}
-                />
-                {errors.email && <p className="text-danger">{errors.email.message}</p>}
-
                 {/* Phone Number */}
                 <input
                   type="number"
@@ -62,6 +63,15 @@ function Register() {
                   {...register("phone", { required: "Phone number is required" })}
                 />
                 {errors.phone && <p className="text-danger">{errors.phone.message}</p>}
+                
+                {/* Email */}
+                <input
+                  type="email"
+                  className={`mb-3 form-control ${errors.email ? "input-errors" : ""}`}
+                  placeholder="Enter Email Id"
+                  {...register("email", { required: "Email is required" })}
+                />
+                {errors.email && <p className="text-danger">{errors.email.message}</p>}
 
                 {/* Password */}
                 <input
